@@ -197,7 +197,7 @@ const columns: ColumnDef<Transaction>[] = [
   },
 ];
 
-const allData = [...data, ...data, ...data, ...data, ...data, ...data, ...data];
+const allData = [...data, ...data, ...data, ...data, ...data, ...data];
 
 export function DataTableDemo() {
   const [sorting, setSorting] = useState<SortingState>([]);

@@ -1,5 +1,3 @@
-"use client";
-
 import { DashboardHeader } from "./_components/header";
 import { History } from "./_components/history";
 import { Overview } from "./_components/overview";
@@ -11,7 +9,7 @@ function DashboardPage() {
       <DashboardHeader />
       <Separator className="w-full" />
       <Overview />
-      <Separator className="w-full mt-6" />
+      <div className="mt-6" />
       <History />
     </main>
   );

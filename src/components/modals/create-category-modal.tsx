@@ -1,3 +1,5 @@
+import { usePathname } from "next/navigation";
+
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -16,22 +18,30 @@ import {
   DrawerFooter,
 } from "../ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { CreateTransactionModalProps, useModal } from "@/hooks/use-modal-store";
+import { CreateCategoryModalProps, useModal } from "@/hooks/use-modal-store";
 
 export function CreateCategoryModal() {
+  const pathname = usePathname();
+
   const { isOpen, onOpen, type, data } = useModal();
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const isModalOpen = isOpen && type === "createCategory";
 
-  const modalData = data as CreateTransactionModalProps["data"];
+  const modalData = data as CreateCategoryModalProps["data"];
 
   function handleOnOpenChange(open: boolean) {
-    if (!open)
+    if (open) return;
+
+    if (pathname === "/") {
       onOpen({
         modalType: "createTransaction",
+        data: {
+          type: modalData?.type!,
+        },
       });
+    }
   }
 
   if (isDesktop) {

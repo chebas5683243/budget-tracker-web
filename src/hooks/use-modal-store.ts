@@ -10,17 +10,14 @@ export type CreateTransactionModalProps = {
   };
 };
 
-export type CreateTransactionCategoryModalProps = {
+export type CreateCategoryModalProps = {
   modalType: "createCategory";
   data?: {
-    test1?: string;
-    test2: TransactionType;
+    type: TransactionType;
   };
 };
 
-type ModalProps =
-  | CreateTransactionModalProps
-  | CreateTransactionCategoryModalProps;
+type ModalProps = CreateTransactionModalProps | CreateCategoryModalProps;
 type ModalType = ModalProps["modalType"] | null;
 type ModalData = ModalProps["data"] | null;
 

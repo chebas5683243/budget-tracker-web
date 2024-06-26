@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { FormControl } from "../ui/form";
@@ -13,8 +15,16 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ value, onChange }: DatePickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  function onSelectDate(date?: Date) {
+    if (!date) return;
+    onChange(date);
+    setIsOpen(false);
+  }
+
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <FormControl>
           <Button
@@ -33,9 +43,7 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
         <Calendar
           mode="single"
           selected={value}
-          onSelect={(date) => {
-            if (date) onChange(date);
-          }}
+          onSelect={onSelectDate}
           disabled={(date) =>
             date > new Date() || date < new Date("1900-01-01")
           }

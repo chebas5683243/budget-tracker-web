@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+
+import { Separator } from "../ui/separator";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -15,13 +18,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useModal } from "@/hooks/use-modal-store";
 import { cn } from "@/lib/utils";
+import { TransactionType } from "@/types/transaction";
 
-import { CheckIcon, ChevronsUpDown } from "lucide-react";
+import { CheckIcon, ChevronsUpDown, PlusSquare } from "lucide-react";
 
 interface CategoryPickerProps {
   value: string;
   onChange: (value: string) => void;
+  trannsactionType: TransactionType;
 }
 
 const categories = [
@@ -36,9 +42,31 @@ const categories = [
   { id: "9", label: "Chinese" },
 ] as const;
 
-export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
+export function CategoryPicker({
+  value,
+  onChange,
+  trannsactionType,
+}: CategoryPickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const { onOpen } = useModal();
+
+  function onCreateCategory() {
+    setIsOpen(false);
+    onOpen({
+      modalType: "createCategory",
+      data: {
+        type: trannsactionType,
+      },
+    });
+  }
+
+  function onSelectCategory(categoryId: string) {
+    onChange(categoryId);
+    setIsOpen(false);
+  }
+
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <FormControl>
           <Button
@@ -56,9 +84,18 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-[500px] p-0">
+      <PopoverContent className="w-52 p-0" side="bottom" align="start">
         <Command>
-          <CommandInput placeholder="Search framework..." className="h-9" />
+          <CommandInput placeholder="Search category..." className="h-9" />
+          <Button
+            variant="ghost"
+            className="text-muted-foreground hover:text-primary gap-2 text-sm font-normal justify-start"
+            onClick={onCreateCategory}
+          >
+            <PlusSquare className="size-4" />
+            Create new
+          </Button>
+          <Separator />
           <CommandList>
             <CommandEmpty>No framework found.</CommandEmpty>
             <CommandGroup>
@@ -66,9 +103,7 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
                 <CommandItem
                   value={language.label}
                   key={language.id}
-                  onSelect={() => {
-                    onChange(language.id);
-                  }}
+                  onSelect={() => onSelectCategory(language.id)}
                 >
                   {language.label}
                   <CheckIcon

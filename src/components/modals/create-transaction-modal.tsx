@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { CategoryPicker } from "../form-fields/category-picker";
 import { DatePicker } from "../form-fields/date-picker";
 import { Button } from "../ui/button";
@@ -11,6 +13,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { CreateTransactionModalProps, useModal } from "@/hooks/use-modal-store";
@@ -21,7 +24,7 @@ import { z } from "zod";
 
 const FormSchema = z.object({
   description: z.string().optional(),
-  amount: z.number().min(1, "Amount must be greater than 0"),
+  amount: z.coerce.number().min(1, "Amount must be greater than 0"),
   category: z.string().min(1, "Category is required"),
   transactionDate: z.date(),
 });
@@ -29,7 +32,7 @@ const FormSchema = z.object({
 type FormData = z.infer<typeof FormSchema>;
 
 export function CreateTransactionModal() {
-  const { isOpen, type, data, onClose } = useModal();
+  const { isOpen, type, data, onClose: onCloseModal } = useModal();
 
   const isModalOpen = isOpen && type === "createTransaction";
 
@@ -46,12 +49,22 @@ export function CreateTransactionModal() {
   function onOpenChange(open: boolean) {
     if (open) return;
     onClose();
-    form.reset();
   }
 
-  function onSubmit(formData: FormData) {
-    console.log(formData);
+  function onClose() {
+    form.reset();
+    onCloseModal();
   }
+
+  function onSubmit() {
+    onClose();
+  }
+
+  useEffect(() => {
+    if (modalData?.selectedCategory) {
+      form.setValue("category", modalData.selectedCategory);
+    }
+  }, [form, modalData?.selectedCategory]);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onOpenChange}>
@@ -104,6 +117,7 @@ export function CreateTransactionModal() {
                     <Input {...field} type="number" />
                   </FormControl>
                   <FormDescription>Transaction amount</FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -114,6 +128,7 @@ export function CreateTransactionModal() {
                 <FormItem className="flex flex-col">
                   <FormLabel>Category</FormLabel>
                   <CategoryPicker
+                    trannsactionType={modalData?.type!}
                     value={field.value}
                     onChange={(categoryId) =>
                       form.setValue("category", categoryId)

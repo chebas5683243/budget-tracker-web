@@ -14,7 +14,6 @@ export function DashboardHeader() {
       modalType: "createTransaction",
       data: {
         type,
-        selectedCategory: "Salary",
       },
     });
   }

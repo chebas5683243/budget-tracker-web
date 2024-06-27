@@ -43,6 +43,8 @@ export function CreateTransactionModal() {
     defaultValues: {
       description: "",
       amount: 0,
+      category: undefined,
+      transactionDate: undefined,
     },
   });
 

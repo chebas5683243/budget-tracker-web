@@ -203,12 +203,11 @@ const data = [
 
 export function History() {
   return (
-    <div className="container">
+    <div className="container mb-10">
       <div className="py-6">
         <h2 className="text-3xl font-bold">History</h2>
       </div>
       <Card className="flex items-center gap-3 p-2">
-        {/* <CardContent className="min-h-64 bg-slate-50 w-full"> */}
         <ResponsiveContainer width="100%" height={300}>
           <BarChart height={300} width={500} data={data}>
             <defs>
@@ -260,7 +259,6 @@ export function History() {
             />
           </BarChart>
         </ResponsiveContainer>
-        {/* </CardContent> */}
       </Card>
     </div>
   );

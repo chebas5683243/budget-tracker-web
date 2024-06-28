@@ -1,3 +1,5 @@
+"use client";
+
 import { CategoryItem } from "./category-item";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useModal } from "@/hooks/use-modal-store";
 
 import { PlusSquare, TrendingDown, TrendingUp } from "lucide-react";
 
@@ -63,6 +66,17 @@ const categories = [
 ];
 
 export function CategoryGroup({ type }: CategoryGroupProps) {
+  const { onOpen } = useModal();
+
+  function onOpenCreateCategoryModal() {
+    onOpen({
+      modalType: "createCategory",
+      data: {
+        type,
+      },
+    });
+  }
+
   return (
     <Card>
       <div className="flex flex-wrap justify-between items-center p-6 gap-y-4">
@@ -83,9 +97,9 @@ export function CategoryGroup({ type }: CategoryGroupProps) {
           </div>
         </div>
         <div className="flex flex-1 justify-end">
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={onOpenCreateCategoryModal}>
             <PlusSquare className="size-4" />
-            <span className="">Create</span>
+            <span>Create</span>
           </Button>
         </div>
       </div>

@@ -4,11 +4,18 @@ import { useState } from "react";
 
 import { CategoriesStats } from "./categories-stats";
 import { OverallStats } from "./overall-stats";
+import { getSettings } from "@/api/settings";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { useAuthQuery } from "@/hooks/use-auth-query";
 
 import { startOfMonth } from "date-fns";
 
 export function Overview() {
+  const { data } = useAuthQuery({
+    queryKey: ["settings"],
+    authQueryFn: getSettings,
+  });
+
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfMonth(new Date()),
     to: new Date(),

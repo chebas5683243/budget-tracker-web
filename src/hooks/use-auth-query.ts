@@ -17,7 +17,6 @@ const createAuthApi = async (tokenGetter: GetToken) => {
   const token = await tokenGetter({
     template: "custom-jwt",
   });
-  console.log(token);
   if (!token) throw new Error("User is not signed in");
   api.defaults.headers.common.Authorization = `Bearer ${token}` ?? "";
   return api;

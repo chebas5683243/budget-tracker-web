@@ -24,32 +24,38 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useGetSettings } from "@/services/settings/getSettings";
+import { useUpdateSettings } from "@/services/settings/updateSettings";
+import { Currency } from "@/types/settings";
 
 import { CheckIcon } from "lucide-react";
 
 const currencies = [
-  { label: "Dollar", symbol: "$" },
-  { label: "Euro", symbol: "€" },
-  { label: "Pound", symbol: "£" },
-  { label: "Yen", symbol: "¥" },
-  { label: "Rupee", symbol: "₹" },
-  { label: "Yuan", symbol: "¥" },
-  { label: "Won", symbol: "₩" },
-  { label: "Real", symbol: "R$" },
-  { label: "Peso", symbol: "$" },
+  { label: "Dollar", symbol: "$", value: Currency.USD },
+  { label: "Euro", symbol: "€", value: Currency.EUR },
+  { label: "Nuevo Sol", symbol: "S/.", value: Currency.PEN },
+  { label: "Pound", symbol: "£", value: Currency.GBP },
+  { label: "Yen", symbol: "¥", value: Currency.JPY },
+  { label: "Rupee", symbol: "₹", value: Currency.INR },
+  { label: "Yuan", symbol: "¥", value: Currency.CNY },
+  { label: "Won", symbol: "₩", value: Currency.KRW },
+  { label: "Real", symbol: "R$", value: Currency.BRL },
+  { label: "Peso", symbol: "$", value: Currency.MXN },
 ];
 
 export function CurrencyPicker() {
+  const { data: settings } = useGetSettings();
+
+  const mutation = useUpdateSettings();
+
   const [isOpen, setIsOpen] = useState(false);
 
-  const [selectedCurrencyName, setSelectedCurrencyName] = useState("Dollar");
-
   const selectedCurrency = currencies.find(
-    (c) => c.label === selectedCurrencyName,
+    (c) => c.value === settings?.currency,
   );
 
-  function onSelectCurrency(currencyName: string) {
-    setSelectedCurrencyName(currencyName);
+  function onSelectCurrency(value: Currency) {
+    mutation.mutate({ currency: value });
     setIsOpen(false);
   }
 
@@ -65,9 +71,13 @@ export function CurrencyPicker() {
             <Button
               variant="outline"
               role="combobox"
-              className="justify-between font-normal pl-3 w-full"
+              className="flex gap-2 justify-start font-normal pl-3 w-full"
             >
-              {selectedCurrency?.symbol} {selectedCurrency?.label}
+              <span className="w-5 inline-flex justify-center">
+                {selectedCurrency?.symbol}
+              </span>
+              <span>-</span>
+              <span>{selectedCurrency?.label}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-52 p-0" side="bottom" align="start">
@@ -79,18 +89,21 @@ export function CurrencyPicker() {
                 <CommandGroup>
                   {currencies.map((currency) => (
                     <CommandItem
-                      value={currency.label}
-                      key={currency.label}
-                      onSelect={() => onSelectCurrency(currency.label)}
+                      value={currency.value}
+                      key={currency.value}
+                      onSelect={() => onSelectCurrency(currency.value)}
                     >
                       <div className="flex gap-2">
-                        <span>{currency.symbol}</span>
+                        <span className="w-5 inline-flex justify-center">
+                          {currency.symbol}
+                        </span>
+                        <span>-</span>
                         <span>{currency.label}</span>
                       </div>
                       <CheckIcon
                         className={cn(
                           "ml-auto h-4 w-4",
-                          currency.label === selectedCurrency?.label
+                          currency.value === selectedCurrency?.value
                             ? "opacity-100"
                             : "opacity-0",
                         )}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useToast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,6 +46,7 @@ const currencies = [
 
 export function CurrencyPicker() {
   const { data: settings } = useGetSettings();
+  const { toast } = useToast();
 
   const mutation = useUpdateSettings();
 
@@ -54,9 +56,21 @@ export function CurrencyPicker() {
     (c) => c.value === settings?.currency,
   );
 
-  function onSelectCurrency(value: Currency) {
-    mutation.mutate({ currency: value });
-    setIsOpen(false);
+  async function onSelectCurrency(value: Currency) {
+    try {
+      toast({
+        description: "loading",
+      });
+      setIsOpen(false);
+      await mutation.mutateAsync({ currency: value });
+      toast({
+        description: "good!",
+      });
+    } catch (e) {
+      toast({
+        description: "error",
+      });
+    }
   }
 
   return (

@@ -62,17 +62,20 @@ export function CurrencyPicker() {
   async function onSelectCurrency(value: Currency) {
     try {
       toast({
-        description: "loading",
+        description: "Updating currency",
+        variant: "loading",
       });
       setLoading(true);
       setIsOpen(false);
       await mutation.mutateAsync({ currency: value });
       toast({
-        description: "good!",
+        description: "Currency updated successuflly 🎉",
+        variant: "success",
       });
     } catch (e) {
       toast({
-        description: "error",
+        description: "Couldn't update currency. Try later.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);

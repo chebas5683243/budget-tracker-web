@@ -51,6 +51,9 @@ export function CurrencyPicker() {
   const mutation = useUpdateSettings();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const isPickerDisabled = loading || !settings;
 
   const selectedCurrency = currencies.find(
     (c) => c.value === settings?.currency,
@@ -61,6 +64,7 @@ export function CurrencyPicker() {
       toast({
         description: "loading",
       });
+      setLoading(true);
       setIsOpen(false);
       await mutation.mutateAsync({ currency: value });
       toast({
@@ -70,6 +74,8 @@ export function CurrencyPicker() {
       toast({
         description: "error",
       });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -86,6 +92,7 @@ export function CurrencyPicker() {
               variant="outline"
               role="combobox"
               className="flex gap-2 justify-start font-normal pl-3 w-full"
+              disabled={isPickerDisabled}
             >
               <span className="w-5 inline-flex justify-center">
                 {selectedCurrency?.symbol}

@@ -37,7 +37,7 @@ export function useUpdateSettings(
 
       return { previousSettings };
     },
-    onError: (err, newTodo, context) => {
+    onError: (err, _, context) => {
       queryClient.setQueryData(["settings"], context?.previousSettings);
     },
     onSettled: () => {

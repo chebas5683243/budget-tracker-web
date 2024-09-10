@@ -9,18 +9,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useModal } from "@/hooks/use-modal-store";
+import { Category } from "@/types/categories";
 
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 
 interface CategoryItemProps {
-  category: {
-    id: string;
-    name: string;
-    icon: string;
-  };
+  category: Category;
 }
 
 export function CategoryItem({ category }: CategoryItemProps) {
+  const { onOpen } = useModal();
+
+  function onEdit() {
+    onOpen({
+      modalType: "editCategory",
+      data: {
+        id: category.id,
+        icon: category.icon,
+        name: category.name,
+        type: category.type,
+      },
+    });
+  }
+
   return (
     <Card className="relative group flex hover:bg-muted-foreground/10 hover:cursor-pointer">
       <DropdownMenu>
@@ -36,7 +48,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
           <DropdownMenuLabel>Options</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem className="flex gap-2">
+            <DropdownMenuItem className="flex gap-2" onClick={onEdit}>
               <Pencil className="size-4" />
               Edit
             </DropdownMenuItem>

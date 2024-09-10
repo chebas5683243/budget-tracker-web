@@ -24,7 +24,9 @@ export function CategoryGroup({ type }: CategoryGroupProps) {
 
   const { data: categories } = useGetCategories();
 
-  const categoriesToRender = categories?.filter(category => category.type === type);
+  const categoriesToRender = categories?.filter(
+    (category) => category.type === type,
+  );
 
   function onOpenCreateCategoryModal() {
     onOpen({

@@ -20,9 +20,10 @@ export type CreateCategoryModalProps = {
 export type EditCategoryModalProps = {
   modalType: "editCategory";
   data?: {
-    type: CategoryType;
+    id: string;
     name: string;
     icon: string;
+    type: CategoryType;
   };
 };
 

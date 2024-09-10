@@ -1,7 +1,9 @@
-import { usePathname } from "next/navigation";
+"use client";
+
 import { useEffect } from "react";
 
 import { EmojiPicker } from "../form-fields/emoji-picker";
+import { useToast } from "../hooks/use-toast";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -20,6 +22,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { EditCategoryModalProps, useModal } from "@/hooks/use-modal-store";
+import { useUpdateCategory } from "@/services/categories/updateCategory";
 import { CategoryType } from "@/types/categories";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,15 +32,16 @@ import { z } from "zod";
 const FormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   icon: z.string().min(1, "Icon is required"),
-  type: z.nativeEnum(CategoryType),
 });
 
 type FormData = z.infer<typeof FormSchema>;
 
 export function EditCategoryModal() {
-  const pathname = usePathname();
+  const { isOpen, type, data, onClose: onCloseModal } = useModal();
 
-  const { isOpen, onOpen, type, data, onClose: onCloseModal } = useModal();
+  const mutation = useUpdateCategory();
+
+  const { toast } = useToast();
 
   const isModalOpen = isOpen && type === "editCategory";
 
@@ -58,26 +62,40 @@ export function EditCategoryModal() {
     onClose();
   }
 
+  function resetFieldValues() {
+    resetForm({
+      name: "",
+      icon: "",
+    });
+  }
+
   function onClose() {
-    resetForm();
-
-    if (pathname === "/") {
-      onOpen({
-        modalType: "createTransaction",
-        data: { type: modalData?.type! },
-      });
-      return;
-    }
-
+    resetFieldValues();
     onCloseModal();
   }
 
-  function onSubmit() {
-    resetForm();
-    onOpen({
-      modalType: "createTransaction",
-      data: { type: modalData?.type!, category: "2" },
-    });
+  async function onSubmit() {
+    try {
+      toast({
+        description: "Updating category",
+        variant: "loading",
+      });
+      await mutation.mutateAsync({
+        id: modalData?.id,
+        name: form.getValues("name"),
+        icon: form.getValues("icon"),
+      });
+      toast({
+        description: "Category updated successuflly 🎉",
+        variant: "success",
+      });
+      onClose();
+    } catch (e) {
+      toast({
+        description: "Couldn't update category. Try later.",
+        variant: "destructive",
+      });
+    }
   }
 
   useEffect(() => {
@@ -85,7 +103,6 @@ export function EditCategoryModal() {
       resetForm({
         name: modalData.name,
         icon: modalData.icon,
-        type: modalData.type,
       });
     }
   }, [resetForm, modalData?.type, modalData?.icon, modalData?.name]);
@@ -95,7 +112,7 @@ export function EditCategoryModal() {
       <DialogContent className="sm:w-[450px]">
         <DialogHeader>
           <DialogTitle>
-            Create{" "}
+            Edit{" "}
             <span
               className={
                 modalData?.type === CategoryType.INCOME
@@ -107,9 +124,7 @@ export function EditCategoryModal() {
             </span>{" "}
             category
           </DialogTitle>
-          <DialogDescription>
-            Categories are used to group your transactions
-          </DialogDescription>
+          <DialogDescription>Edit category information</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -119,6 +134,7 @@ export function EditCategoryModal() {
             <FormField
               control={form.control}
               name="name"
+              disabled={mutation.isPending}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
@@ -134,6 +150,7 @@ export function EditCategoryModal() {
             <FormField
               control={form.control}
               name="icon"
+              disabled={mutation.isPending}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Icon</FormLabel>
@@ -146,10 +163,17 @@ export function EditCategoryModal() {
               )}
             />
             <div className="flex gap-2 self-end">
-              <Button type="button" variant="secondary" onClick={onClose}>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={mutation.isPending}
+                onClick={onClose}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Create</Button>
+              <Button type="submit" disabled={mutation.isPending}>
+                Save
+              </Button>
             </div>
           </form>
         </Form>

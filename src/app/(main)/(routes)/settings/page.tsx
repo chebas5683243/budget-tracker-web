@@ -1,6 +1,7 @@
 import { CategoryGroup } from "./_components/category-group";
 import { CurrencyPicker } from "./_components/currency-picker";
 import { Separator } from "@/components/ui/separator";
+import { CategoryType } from "@/types/categories";
 
 function SettingsPage() {
   return (
@@ -14,8 +15,8 @@ function SettingsPage() {
       <Separator className="w-full" />
       <div className="flex flex-col gap-4 container py-4">
         <CurrencyPicker />
-        <CategoryGroup type="income" />
-        <CategoryGroup type="expense" />
+        <CategoryGroup type={CategoryType.INCOME} />
+        <CategoryGroup type={CategoryType.EXPENSE} />
       </div>
     </main>
   );

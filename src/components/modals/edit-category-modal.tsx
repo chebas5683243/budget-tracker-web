@@ -1,4 +1,5 @@
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 import { EmojiPicker } from "../form-fields/emoji-picker";
 import { Button } from "../ui/button";
@@ -18,7 +19,7 @@ import {
   FormLabel,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { CreateCategoryModalProps, useModal } from "@/hooks/use-modal-store";
+import { EditCategoryModalProps, useModal } from "@/hooks/use-modal-store";
 import { CategoryType } from "@/types/categories";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,18 +29,19 @@ import { z } from "zod";
 const FormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   icon: z.string().min(1, "Icon is required"),
+  type: z.nativeEnum(CategoryType),
 });
 
 type FormData = z.infer<typeof FormSchema>;
 
-export function CreateCategoryModal() {
+export function EditCategoryModal() {
   const pathname = usePathname();
 
   const { isOpen, onOpen, type, data, onClose: onCloseModal } = useModal();
 
-  const isModalOpen = isOpen && type === "createCategory";
+  const isModalOpen = isOpen && type === "editCategory";
 
-  const modalData = data as CreateCategoryModalProps["data"];
+  const modalData = data as EditCategoryModalProps["data"];
 
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
@@ -49,13 +51,15 @@ export function CreateCategoryModal() {
     },
   });
 
+  const { reset: resetForm } = form;
+
   function onOpenChange(open: boolean) {
     if (open) return;
     onClose();
   }
 
   function onClose() {
-    form.reset();
+    resetForm();
 
     if (pathname === "/") {
       onOpen({
@@ -69,12 +73,22 @@ export function CreateCategoryModal() {
   }
 
   function onSubmit() {
-    form.reset();
+    resetForm();
     onOpen({
       modalType: "createTransaction",
       data: { type: modalData?.type!, category: "2" },
     });
   }
+
+  useEffect(() => {
+    if (modalData?.type && modalData.icon && modalData.name) {
+      resetForm({
+        name: modalData.name,
+        icon: modalData.icon,
+        type: modalData.type,
+      });
+    }
+  }, [resetForm, modalData?.type, modalData?.icon, modalData?.name]);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onOpenChange}>

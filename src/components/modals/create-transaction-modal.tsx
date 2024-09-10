@@ -17,6 +17,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { CreateTransactionModalProps, useModal } from "@/hooks/use-modal-store";
+import { CategoryType } from "@/types/categories";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -63,10 +64,10 @@ export function CreateTransactionModal() {
   }
 
   useEffect(() => {
-    if (modalData?.selectedCategory) {
-      form.setValue("category", modalData.selectedCategory);
+    if (modalData?.category) {
+      form.setValue("category", modalData.category);
     }
-  }, [form, modalData?.selectedCategory]);
+  }, [form, modalData?.category]);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onOpenChange}>
@@ -76,7 +77,7 @@ export function CreateTransactionModal() {
             Create a new{" "}
             <span
               className={
-                modalData?.type === "income"
+                modalData?.type === CategoryType.INCOME
                   ? "text-emerald-500"
                   : "text-red-500"
               }

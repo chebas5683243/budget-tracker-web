@@ -1,6 +1,7 @@
 import { usePathname } from "next/navigation";
 
 import { EmojiPicker } from "../form-fields/emoji-picker";
+import { useToast } from "../hooks/use-toast";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -19,6 +20,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { CreateCategoryModalProps, useModal } from "@/hooks/use-modal-store";
+import { useCreateCategory } from "@/services/categories/createCategory";
 import { CategoryType } from "@/types/categories";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,6 +39,10 @@ export function CreateCategoryModal() {
 
   const { isOpen, onOpen, type, data, onClose: onCloseModal } = useModal();
 
+  const mutation = useCreateCategory();
+
+  const { toast } = useToast();
+
   const isModalOpen = isOpen && type === "createCategory";
 
   const modalData = data as CreateCategoryModalProps["data"];
@@ -49,18 +55,27 @@ export function CreateCategoryModal() {
     },
   });
 
+  const { reset: resetForm } = form;
+
   function onOpenChange(open: boolean) {
     if (open) return;
     onClose();
   }
 
-  function onClose() {
-    form.reset();
+  function resetFieldValues() {
+    resetForm({
+      name: "",
+      icon: "",
+    });
+  }
+
+  function onClose(categoryId?: string) {
+    resetFieldValues();
 
     if (pathname === "/") {
       onOpen({
         modalType: "createTransaction",
-        data: { type: modalData?.type! },
+        data: { type: modalData?.type!, category: categoryId },
       });
       return;
     }
@@ -68,12 +83,31 @@ export function CreateCategoryModal() {
     onCloseModal();
   }
 
-  function onSubmit() {
-    form.reset();
-    onOpen({
-      modalType: "createTransaction",
-      data: { type: modalData?.type!, category: "2" },
-    });
+  async function onSubmit() {
+    try {
+      toast({
+        description: "Creating category",
+        variant: "loading",
+      });
+
+      await mutation.mutateAsync({
+        name: form.getValues("name"),
+        icon: form.getValues("icon"),
+        type: modalData?.type,
+      });
+
+      toast({
+        description: "Category created successuflly 🎉",
+        variant: "success",
+      });
+
+      onClose();
+    } catch (e) {
+      toast({
+        description: "Couldn't create category. Try later.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -105,6 +139,7 @@ export function CreateCategoryModal() {
             <FormField
               control={form.control}
               name="name"
+              disabled={mutation.isPending}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
@@ -120,6 +155,7 @@ export function CreateCategoryModal() {
             <FormField
               control={form.control}
               name="icon"
+              disabled={mutation.isPending}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Icon</FormLabel>
@@ -132,10 +168,17 @@ export function CreateCategoryModal() {
               )}
             />
             <div className="flex gap-2 self-end">
-              <Button type="button" variant="secondary" onClick={onClose}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => onClose()}
+                disabled={mutation.isPending}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Create</Button>
+              <Button type="submit" disabled={mutation.isPending}>
+                Create
+              </Button>
             </div>
           </form>
         </Form>

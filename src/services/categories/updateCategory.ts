@@ -7,7 +7,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-type CategoryMutation = UseMutationOptions<
+type UpdateCategoryMutation = UseMutationOptions<
   void,
   unknown,
   Partial<Category>,
@@ -15,7 +15,7 @@ type CategoryMutation = UseMutationOptions<
 >;
 
 export function useUpdateCategory(
-  options?: Omit<CategoryMutation, "mutationFn">,
+  options?: Omit<UpdateCategoryMutation, "mutationFn">,
 ) {
   const { createAuthApi } = useAuthAxios();
   const queryClient = useQueryClient();
@@ -23,7 +23,7 @@ export function useUpdateCategory(
   const mutation = useMutation({
     mutationFn: async (updatedCategory) => {
       const apiInstance = await createAuthApi();
-      await apiInstance.patch<Category>(
+      await apiInstance.patch(
         `/categories/${updatedCategory.id}`,
         updatedCategory,
       );
@@ -49,15 +49,13 @@ export function useUpdateCategory(
 
       return { oldCategory };
     },
-    onError: (err, { id }, context) => {
-      queryClient.setQueryData<Category[]>(
-        ["categories", id],
-        (oldCategories) =>
-          oldCategories?.map((cat) =>
-            cat.id === context?.oldCategory?.id
-              ? { ...cat, ...context.oldCategory }
-              : cat,
-          ),
+    onError: (err, _, context) => {
+      queryClient.setQueryData<Category[]>(["categories"], (oldCategories) =>
+        oldCategories?.map((cat) =>
+          cat.id === context?.oldCategory?.id
+            ? { ...cat, ...context.oldCategory }
+            : cat,
+        ),
       );
     },
     onSettled: () => {

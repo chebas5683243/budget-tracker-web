@@ -80,15 +80,18 @@ export function EditCategoryModal() {
         description: "Updating category",
         variant: "loading",
       });
+
       await mutation.mutateAsync({
         id: modalData?.id,
         name: form.getValues("name"),
         icon: form.getValues("icon"),
       });
+
       toast({
         description: "Category updated successuflly 🎉",
         variant: "success",
       });
+
       onClose();
     } catch (e) {
       toast({

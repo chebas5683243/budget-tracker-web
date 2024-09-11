@@ -23,7 +23,7 @@ export function useUpdateSettings(
   const mutation = useMutation({
     mutationFn: async (newSettings) => {
       const apiInstance = await createAuthApi();
-      await apiInstance.patch<Settings>("/settings", newSettings);
+      await apiInstance.patch("/settings", newSettings);
     },
     onMutate: async (newSettings) => {
       await queryClient.cancelQueries({ queryKey: ["settings"] });

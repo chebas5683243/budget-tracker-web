@@ -27,10 +27,18 @@ export type EditCategoryModalProps = {
   };
 };
 
+export type DeleteCategoryModalProps = {
+  modalType: "deleteCategory";
+  data?: {
+    categoryId: string;
+  };
+};
+
 type ModalProps =
   | CreateTransactionModalProps
   | CreateCategoryModalProps
-  | EditCategoryModalProps;
+  | EditCategoryModalProps
+  | DeleteCategoryModalProps;
 type ModalType = ModalProps["modalType"] | null;
 type ModalData = ModalProps["data"] | null;
 

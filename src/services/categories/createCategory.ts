@@ -34,9 +34,7 @@ export function useCreateCategory(
     onMutate: async (newCategory) => {
       const newCatogoryTempId = uuidv4();
 
-      await queryClient.cancelQueries({
-        queryKey: ["categories", newCategory.id],
-      });
+      await queryClient.cancelQueries({ queryKey: ["categories"] });
 
       queryClient.setQueryData<Category[]>(["categories"], (oldCategories) => {
         return [

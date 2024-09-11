@@ -29,9 +29,7 @@ export function useUpdateCategory(
       );
     },
     onMutate: async (updatedCategory) => {
-      await queryClient.cancelQueries({
-        queryKey: ["categories", updatedCategory.id],
-      });
+      await queryClient.cancelQueries({ queryKey: ["categories"] });
 
       const previousCategories = queryClient.getQueryData<Category[]>([
         "categories",

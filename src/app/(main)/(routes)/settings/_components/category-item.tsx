@@ -33,6 +33,15 @@ export function CategoryItem({ category }: CategoryItemProps) {
     });
   }
 
+  function onDelete() {
+    onOpen({
+      modalType: "deleteCategory",
+      data: {
+        categoryId: category.id,
+      },
+    });
+  }
+
   return (
     <Card className="relative group flex hover:bg-muted-foreground/10 hover:cursor-pointer">
       <DropdownMenu>
@@ -52,7 +61,10 @@ export function CategoryItem({ category }: CategoryItemProps) {
               <Pencil className="size-4" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex gap-2 text-red-400 focus:bg-red-400/20 focus:text-red-400">
+            <DropdownMenuItem
+              className="flex gap-2 text-red-400 focus:bg-red-400/20 focus:text-red-400"
+              onClick={onDelete}
+            >
               <Trash className="size-4" />
               Delete
             </DropdownMenuItem>

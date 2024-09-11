@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { CreateCategoryModal } from "../modals/create-category-modal";
 import { CreateTransactionModal } from "../modals/create-transaction-modal";
+import { DeleteCategoryModal } from "../modals/delete-category-modal";
 import { EditCategoryModal } from "../modals/edit-category-modal";
 
 export function ModalProvider() {
@@ -22,6 +23,7 @@ export function ModalProvider() {
       <CreateTransactionModal />
       <CreateCategoryModal />
       <EditCategoryModal />
+      <DeleteCategoryModal />
     </>
   );
 }

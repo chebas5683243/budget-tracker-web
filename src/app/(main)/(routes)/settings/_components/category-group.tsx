@@ -1,6 +1,7 @@
 "use client";
 
 import { CategoryItem } from "./category-item";
+import { CategoryItemSkeleton } from "./category-item-skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useModal } from "@/hooks/use-modal-store";
+import { cn } from "@/lib/utils";
 import { useGetCategories } from "@/services/categories/getCategories";
 import { CategoryType } from "@/types/categories";
 
@@ -22,11 +24,11 @@ interface CategoryGroupProps {
 export function CategoryGroup({ type }: CategoryGroupProps) {
   const { onOpen } = useModal();
 
-  const { data: categories } = useGetCategories();
+  const { data: categories, isLoading } = useGetCategories();
 
-  const categoriesToRender = categories?.filter(
-    (category) => category.type === type,
-  );
+  const categoriesToRender = categories
+    ?.filter((category) => category.type === type)
+    .toSorted((cat1, cat2) => cat1.name.localeCompare(cat2.name));
 
   function onOpenCreateCategoryModal() {
     onOpen({
@@ -65,6 +67,29 @@ export function CategoryGroup({ type }: CategoryGroupProps) {
       </div>
       <Separator />
       <CardContent className="grid grid-flow-row sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-2 gap-2">
+        {isLoading &&
+          Array.from({ length: 2 }).map(() => <CategoryItemSkeleton />)}
+        {categoriesToRender?.length === 0 && (
+          <div className="flex flex-col h-28 sm:col-span-2 md:col-span-3 lg:col-span-4 justify-center items-center">
+            <p>
+              No
+              <span
+                className={cn(
+                  "m-1",
+                  type === CategoryType.INCOME
+                    ? "text-emerald-500"
+                    : "text-red-500",
+                )}
+              >
+                {type.toLowerCase()}
+              </span>
+              categories yet
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Create one to get started
+            </p>
+          </div>
+        )}
         {categoriesToRender?.map((category) => (
           <CategoryItem key={category.id} category={category} />
         ))}

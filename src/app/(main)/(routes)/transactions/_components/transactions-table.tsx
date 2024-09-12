@@ -19,6 +19,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { useGetTransactions } from "@/services/transactions/getTransactions";
+import { type Category, CategoryType } from "@/types/categories";
+import type { Transaction } from "@/types/transactions";
 
 import {
   Column,
@@ -40,91 +43,6 @@ import {
   ChevronsUpDown,
 } from "lucide-react";
 
-type Transaction = {
-  id: string;
-  amount: number;
-  description: string;
-  date: number;
-  type: "expense" | "income";
-  category: string;
-  categoryIcon: string;
-};
-
-const data: Transaction[] = [
-  {
-    id: "495a7683-b9c0-4e2d-9b5d-52c908f9919d",
-    amount: 2000,
-    description: "asd",
-    date: 1623945600000,
-    type: "expense",
-    category: "test12312",
-    categoryIcon: "😐",
-  },
-  {
-    id: "73b011fe-179d-4df6-8839-ee826d6351bc",
-    amount: 4000,
-    description: "",
-    date: 1623945600000,
-    type: "income",
-    category: "123123",
-    categoryIcon: "🫢",
-  },
-  {
-    id: "3b2b8b3e-b1f5-4ce4-9c08-42c8503840a0",
-    amount: 1234,
-    description: "12312",
-    date: 1623945600000,
-    type: "income",
-    category: "aaa",
-    categoryIcon: "🥲",
-  },
-  {
-    id: "3916567c-2004-4951-8c8b-76be6e589f64",
-    amount: 11,
-    description: "asdasd",
-    date: 1623945600000,
-    type: "income",
-    category: "123123",
-    categoryIcon: "🫢",
-  },
-  {
-    id: "af12117d-477a-45b5-a5a7-c39c5c056d26",
-    amount: 2000,
-    description: "asd",
-    date: 1623945600000,
-    type: "income",
-    category: "asd",
-    categoryIcon: "😜",
-  },
-  {
-    id: "4d159bb2-1b26-40b9-92f3-990ee569ba42",
-    amount: 1000,
-    description: "test 2",
-    date: 1623945600000,
-    type: "income",
-    category: "o_ O",
-    categoryIcon: "😆",
-  },
-  {
-    id: "513ca573-b694-4b5a-81be-ab682c334c5f",
-    amount: 23,
-    description: "test2",
-    date: 1623945600000,
-    type: "expense",
-    category: "test12312",
-    categoryIcon: "😐",
-  },
-  {
-    id: "127c103a-be7f-4369-ad30-8d47ae63b51e",
-    amount: 1000,
-    description: "test",
-    date: 1623945600000,
-    type: "income",
-    category: "o_ O",
-    categoryIcon: "😆",
-  },
-];
-
 const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "category",
@@ -135,8 +53,10 @@ const columns: ColumnDef<Transaction>[] = [
         onClick={() => toggleSortFn(column)}
       />
     ),
-    cell: ({ row }) =>
-      `${row.original.categoryIcon} ${row.getValue("category")}`,
+    cell: ({ row }) => {
+      const category: Category = row.getValue("category");
+      return `${category.icon} ${category.name}`;
+    },
   },
   {
     accessorKey: "description",
@@ -177,18 +97,21 @@ const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "type",
     header: "Type",
-    cell: ({ row }) => (
-      <div
-        className={cn(
-          "capitalize p-2 rounded-lg text-center max-w-32 m-auto",
-          row.getValue("type") === "expense"
-            ? "bg-red-400/10 text-red-500"
-            : "bg-emerald-400/10 text-emerald-500",
-        )}
-      >
-        {row.getValue("type")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const category: Category = row.getValue("category");
+      return (
+        <div
+          className={cn(
+            "capitalize p-2 rounded-lg text-center max-w-32 m-auto",
+            category.type === CategoryType.EXPENSE
+              ? "bg-red-400/10 text-red-500"
+              : "bg-emerald-400/10 text-emerald-500",
+          )}
+        >
+          {category.type}
+        </div>
+      );
+    },
     meta: {
       style: {
         textAlign: "center",
@@ -196,8 +119,6 @@ const columns: ColumnDef<Transaction>[] = [
     },
   },
 ];
-
-const allData = [...data, ...data, ...data, ...data, ...data, ...data];
 
 export function DataTableDemo() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -208,8 +129,10 @@ export function DataTableDemo() {
     pageSize: 10,
   });
 
+  const { data: transactions } = useGetTransactions();
+
   const table = useReactTable({
-    data: allData,
+    data: transactions || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

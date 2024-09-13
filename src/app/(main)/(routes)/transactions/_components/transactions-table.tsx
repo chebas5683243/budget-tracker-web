@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { transactionsColumns } from "./transactions-table-columns";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,17 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import { useGetTransactions } from "@/services/transactions/getTransactions";
-import { type Category, CategoryType } from "@/types/categories";
 import type { Transaction } from "@/types/transactions";
 
 import {
-  Column,
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
+  type ColumnFiltersState,
+  type Row,
+  type SortingState,
+  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -36,115 +34,48 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronDownIcon,
-  ChevronsUpDown,
-} from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
 
-const columns: ColumnDef<Transaction>[] = [
-  {
-    accessorKey: "category",
-    header: ({ column }) => (
-      <SortIconIndicator
-        title="Category"
-        isSorted={column.getIsSorted()}
-        onClick={() => toggleSortFn(column)}
-      />
-    ),
-    cell: ({ row }) => {
-      const category: Category = row.getValue("category");
-      return `${category.icon} ${category.name}`;
-    },
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-  },
-  {
-    accessorKey: "date",
-    header: ({ column }) => (
-      <SortIconIndicator
-        title="Date"
-        isSorted={column.getIsSorted()}
-        onClick={() => toggleSortFn(column)}
-      />
-    ),
-    cell: ({ row }) => new Date(row.getValue("date")).toLocaleDateString(),
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => (
-      <SortIconIndicator
-        title="Amount"
-        isSorted={column.getIsSorted()}
-        onClick={() => toggleSortFn(column)}
-      />
-    ),
-    cell: ({ row }) => (
-      <div className="flex gap-2 justify-center">
-        <span className="w-10 text-right">{row.getValue("amount")}</span>
-        <span>USD</span>
-      </div>
-    ),
-    meta: {
-      style: {
-        textAlign: "center",
-      },
-    },
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-    cell: ({ row }) => {
-      const category: Category = row.getValue("category");
-      return (
-        <div
-          className={cn(
-            "capitalize p-2 rounded-lg text-center max-w-32 m-auto",
-            category.type === CategoryType.EXPENSE
-              ? "bg-red-400/10 text-red-500"
-              : "bg-emerald-400/10 text-emerald-500",
-          )}
-        >
-          {category.type}
-        </div>
-      );
-    },
-    meta: {
-      style: {
-        textAlign: "center",
-      },
-    },
-  },
-];
+interface TransactionsTableProps {
+  startDate?: number;
+  endDate?: number;
+}
 
-export function DataTableDemo() {
+export function TransactionsTable({
+  startDate,
+  endDate,
+}: TransactionsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [globalFilter, setGlobalFilter] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const { data: transactions } = useGetTransactions();
+  const { data: transactions } = useGetTransactions({
+    startDate: 0,
+    endDate: 1,
+  });
 
   const table = useReactTable({
     data: transactions || [],
-    columns,
+    columns: transactionsColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn,
     state: {
       sorting,
       columnFilters,
+      globalFilter,
       columnVisibility,
       pagination,
     },
@@ -154,13 +85,9 @@ export function DataTableDemo() {
     <div className="w-full container">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter description..."
-          value={
-            (table.getColumn("description")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("description")?.setFilterValue(event.target.value)
-          }
+          placeholder="Filter by data..."
+          value={globalFilter ?? ""}
+          onChange={(event) => setGlobalFilter(String(event.target.value))}
           className="max-w-sm"
         />
         <DropdownMenu>
@@ -233,7 +160,7 @@ export function DataTableDemo() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={transactionsColumns.length}
                   className="h-24 text-center"
                 >
                   No results.
@@ -275,31 +202,30 @@ export function DataTableDemo() {
   );
 }
 
-function toggleSortFn(column: Column<any, any>) {
-  const isSorted = column.getIsSorted();
+function globalFilterFn(
+  row: Row<Transaction>,
+  columnId: string,
+  filterValue: string,
+) {
+  if (columnId === "category") {
+    const { name } = row.original.category;
+    return name.toLowerCase().includes(filterValue.toLowerCase());
+  }
 
-  if (isSorted === false) column.toggleSorting(false);
-  if (isSorted === "asc") column.toggleSorting(true);
-  if (isSorted === "desc") column.clearSorting();
-}
+  if (columnId === "description") {
+    const description = row.original.description || "";
+    return description.toLowerCase().includes(filterValue.toLowerCase());
+  }
 
-interface SortIconIndicatorProps {
-  title: string;
-  onClick: () => void;
-  isSorted: false | "asc" | "desc";
-}
+  if (columnId === "amount") {
+    const { amount } = row.original;
+    return amount.toString().includes(filterValue.toLowerCase());
+  }
 
-function SortIconIndicator({
-  title,
-  onClick,
-  isSorted,
-}: SortIconIndicatorProps) {
-  return (
-    <Button variant="ghost" onClick={onClick}>
-      {title}
-      {!isSorted && <ChevronsUpDown className="ml-2 h-4 w-4" />}
-      {isSorted === "asc" && <ArrowDown className="ml-2 h-4 w-4" />}
-      {isSorted === "desc" && <ArrowUp className="ml-2 h-4 w-4" />}
-    </Button>
-  );
+  if (columnId === "type") {
+    const { type } = row.original.category;
+    return type.toLowerCase().includes(filterValue.toLowerCase());
+  }
+
+  return false;
 }

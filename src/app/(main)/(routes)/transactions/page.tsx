@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { DataTableDemo } from "./_components/transactions-table";
+import { TransactionsTable } from "./_components/transactions-table";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Separator } from "@/components/ui/separator";
 
@@ -32,7 +32,7 @@ function TransactionsPage() {
         </div>
       </div>
       <Separator className="w-full" />
-      <DataTableDemo />
+      <TransactionsTable startDate={0} endDate={1} />
     </main>
   );
 }

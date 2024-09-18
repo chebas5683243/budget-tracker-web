@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { TransactionsTable } from "./_components/transactions-table";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Separator } from "@/components/ui/separator";
+import { useGetTransactions } from "@/services/transactions/getTransactions";
 
 import { startOfMonth } from "date-fns";
 
@@ -13,6 +14,17 @@ function TransactionsPage() {
     from: startOfMonth(new Date()),
     to: new Date(),
   });
+
+  const { data: transactions, isFetching: loadingTransactions } =
+    useGetTransactions({
+      startDate: dateRange.from.getTime(),
+      endDate: dateRange.to.getTime(),
+    });
+
+  const transactionsToRender = useMemo(
+    () => transactions || [],
+    [transactions],
+  );
 
   return (
     <main>
@@ -32,7 +44,10 @@ function TransactionsPage() {
         </div>
       </div>
       <Separator className="w-full" />
-      <TransactionsTable startDate={0} endDate={1} />
+      <TransactionsTable
+        transactions={transactionsToRender}
+        fetchingData={loadingTransactions}
+      />
     </main>
   );
 }

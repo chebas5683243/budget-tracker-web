@@ -1,14 +1,7 @@
-import type { CategoryType } from "@/types/categories";
+import type { Category, CategoryType } from "@/types/categories";
+import { Transaction } from "@/types/transactions";
 
 import { create } from "zustand";
-
-export type CreateTransactionModalProps = {
-  modalType: "createTransaction";
-  data?: {
-    category?: string;
-    type: CategoryType;
-  };
-};
 
 export type CreateCategoryModalProps = {
   modalType: "createCategory";
@@ -19,12 +12,7 @@ export type CreateCategoryModalProps = {
 
 export type EditCategoryModalProps = {
   modalType: "editCategory";
-  data?: {
-    id: string;
-    name: string;
-    icon: string;
-    type: CategoryType;
-  };
+  data?: Category;
 };
 
 export type DeleteCategoryModalProps = {
@@ -34,11 +22,33 @@ export type DeleteCategoryModalProps = {
   };
 };
 
+export type CreateTransactionModalProps = {
+  modalType: "createTransaction";
+  data?: {
+    category?: string;
+    type: CategoryType;
+  };
+};
+
+export type EditTransactionModalProps = {
+  modalType: "editTransaction";
+  data?: Transaction;
+};
+
+export type DeleteTransactionModalProps = {
+  modalType: "deleteTransaction";
+  data?: {
+    transactionId: string;
+  };
+};
+
 type ModalProps =
-  | CreateTransactionModalProps
   | CreateCategoryModalProps
   | EditCategoryModalProps
-  | DeleteCategoryModalProps;
+  | DeleteCategoryModalProps
+  | CreateTransactionModalProps
+  | EditTransactionModalProps
+  | DeleteTransactionModalProps;
 type ModalType = ModalProps["modalType"] | null;
 type ModalData = ModalProps["data"] | null;
 

@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
+import { SortIconIndicator } from "./sort-icon-indicator";
+import { TransactionActions } from "./transaction-actions";
 import { cn } from "@/lib/utils";
 import { CategoryType } from "@/types/categories";
 import { type Transaction } from "@/types/transactions";
 
 import { Column, type ColumnDef } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 
 export const transactionsColumns: ColumnDef<Transaction>[] = [
   {
@@ -87,6 +87,10 @@ export const transactionsColumns: ColumnDef<Transaction>[] = [
       },
     },
   },
+  {
+    id: "actions",
+    cell: ({ row }) => <TransactionActions transaction={row.original} />,
+  },
 ];
 
 function toggleSortFn(column: Column<any, any>) {
@@ -95,25 +99,4 @@ function toggleSortFn(column: Column<any, any>) {
   if (isSorted === false) column.toggleSorting(false);
   if (isSorted === "asc") column.toggleSorting(true);
   if (isSorted === "desc") column.clearSorting();
-}
-
-interface SortIconIndicatorProps {
-  title: string;
-  onClick: () => void;
-  isSorted: false | "asc" | "desc";
-}
-
-function SortIconIndicator({
-  title,
-  onClick,
-  isSorted,
-}: SortIconIndicatorProps) {
-  return (
-    <Button variant="ghost" onClick={onClick}>
-      {title}
-      {!isSorted && <ChevronsUpDown className="ml-2 h-4 w-4" />}
-      {isSorted === "asc" && <ArrowDown className="ml-2 h-4 w-4" />}
-      {isSorted === "desc" && <ArrowUp className="ml-2 h-4 w-4" />}
-    </Button>
-  );
 }

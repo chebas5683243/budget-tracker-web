@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { TableRowSkeleton } from "./table-row-skeleton";
 import { transactionsColumns } from "./transactions-table-columns";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetTransactions } from "@/services/transactions/getTransactions";
 import type { Transaction } from "@/types/transactions";
 
 import {
@@ -37,13 +37,13 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 
 interface TransactionsTableProps {
-  startDate?: number;
-  endDate?: number;
+  transactions: Transaction[];
+  fetchingData: boolean;
 }
 
 export function TransactionsTable({
-  startDate,
-  endDate,
+  transactions,
+  fetchingData,
 }: TransactionsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -54,13 +54,8 @@ export function TransactionsTable({
     pageSize: 10,
   });
 
-  const { data: transactions } = useGetTransactions({
-    startDate: 0,
-    endDate: 1,
-  });
-
   const table = useReactTable({
-    data: transactions || [],
+    data: transactions,
     columns: transactionsColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -140,34 +135,38 @@ export function TransactionsTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+          {fetchingData ? (
+            <TableRowSkeleton nColumns={table.getVisibleFlatColumns().length} />
+          ) : (
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={transactionsColumns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={transactionsColumns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+              )}
+            </TableBody>
+          )}
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">

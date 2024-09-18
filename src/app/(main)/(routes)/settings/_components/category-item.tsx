@@ -24,12 +24,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
   function onEdit() {
     onOpen({
       modalType: "editCategory",
-      data: {
-        id: category.id,
-        icon: category.icon,
-        name: category.name,
-        type: category.type,
-      },
+      data: category,
     });
   }
 

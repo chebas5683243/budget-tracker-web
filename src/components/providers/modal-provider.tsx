@@ -6,6 +6,7 @@ import { CreateCategoryModal } from "../modals/create-category-modal";
 import { CreateTransactionModal } from "../modals/create-transaction-modal";
 import { DeleteCategoryModal } from "../modals/delete-category-modal";
 import { EditCategoryModal } from "../modals/edit-category-modal";
+import { EditTransactionModal } from "../modals/edit-transaction-modal";
 
 export function ModalProvider() {
   const [isMounted, setIsMounted] = useState(false);
@@ -20,10 +21,11 @@ export function ModalProvider() {
 
   return (
     <>
-      <CreateTransactionModal />
       <CreateCategoryModal />
       <EditCategoryModal />
       <DeleteCategoryModal />
+      <CreateTransactionModal />
+      <EditTransactionModal />
     </>
   );
 }

@@ -1,5 +1,3 @@
-import { usePathname } from "next/navigation";
-
 import { EmojiPicker } from "../form-fields/emoji-picker";
 import { useToast } from "../hooks/use-toast";
 import { Button } from "../ui/button";
@@ -35,8 +33,6 @@ const FormSchema = z.object({
 type FormData = z.infer<typeof FormSchema>;
 
 export function CreateCategoryModal() {
-  const pathname = usePathname();
-
   const { isOpen, onOpen, type, data, onClose: onCloseModal } = useModal();
 
   const mutation = useCreateCategory();
@@ -72,11 +68,18 @@ export function CreateCategoryModal() {
   function onClose(categoryId?: string) {
     resetFieldValues();
 
-    if (pathname === "/") {
-      onOpen({
-        modalType: "createTransaction",
-        data: { type: modalData?.type!, category: categoryId },
-      });
+    if (modalData?.parentModal) {
+      if (modalData.parentModal.modalType === "createTransaction") {
+        onOpen({
+          modalType: "createTransaction",
+          data: { newCategoryId: categoryId, type: modalData.type },
+        });
+      } else if (modalData.parentModal.modalType === "editTransaction") {
+        onOpen({
+          modalType: "editTransaction",
+          data: { ...modalData.parentModal.data!, newCategoryId: categoryId },
+        });
+      }
       return;
     }
 
@@ -90,7 +93,7 @@ export function CreateCategoryModal() {
         variant: "loading",
       });
 
-      await mutation.mutateAsync({
+      const { newCategoryId } = await mutation.mutateAsync({
         name: form.getValues("name"),
         icon: form.getValues("icon"),
         type: modalData?.type,
@@ -101,7 +104,7 @@ export function CreateCategoryModal() {
         variant: "success",
       });
 
-      onClose();
+      onClose(newCategoryId);
     } catch (e) {
       toast({
         description: "Couldn't create category. Try later.",

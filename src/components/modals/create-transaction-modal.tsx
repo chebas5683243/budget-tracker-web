@@ -27,7 +27,7 @@ const FormSchema = z.object({
   description: z.string().optional(),
   amount: z.coerce.number().min(1, "Amount must be greater than 0"),
   category: z.string().min(1, "Category is required"),
-  transactionDate: z.date(),
+  transactionDate: z.number(),
 });
 
 type FormData = z.infer<typeof FormSchema>;
@@ -64,10 +64,10 @@ export function CreateTransactionModal() {
   }
 
   useEffect(() => {
-    if (modalData?.category) {
-      form.setValue("category", modalData.category);
+    if (modalData?.newCategoryId) {
+      form.setValue("category", modalData.newCategoryId);
     }
-  }, [form, modalData?.category]);
+  }, [form, modalData?.newCategoryId]);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onOpenChange}>
@@ -150,8 +150,10 @@ export function CreateTransactionModal() {
                 <FormItem className="flex flex-col">
                   <FormLabel>Transaction date</FormLabel>
                   <DatePicker
-                    onChange={(date) => form.setValue("transactionDate", date)}
-                    value={field.value}
+                    onChange={(date) =>
+                      form.setValue("transactionDate", date.getTime())
+                    }
+                    value={new Date(field.value)}
                   />
                   <FormDescription>Select a date for this</FormDescription>
                 </FormItem>

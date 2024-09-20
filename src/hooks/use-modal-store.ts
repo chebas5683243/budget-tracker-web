@@ -7,6 +7,7 @@ export type CreateCategoryModalProps = {
   modalType: "createCategory";
   data?: {
     type: CategoryType;
+    parentModal?: CreateTransactionModalProps | EditTransactionModalProps;
   };
 };
 
@@ -25,14 +26,14 @@ export type DeleteCategoryModalProps = {
 export type CreateTransactionModalProps = {
   modalType: "createTransaction";
   data?: {
-    category?: string;
+    newCategoryId?: string;
     type: CategoryType;
   };
 };
 
 export type EditTransactionModalProps = {
   modalType: "editTransaction";
-  data?: Transaction;
+  data?: Transaction & { newCategoryId?: string };
 };
 
 export type DeleteTransactionModalProps = {
@@ -42,15 +43,15 @@ export type DeleteTransactionModalProps = {
   };
 };
 
-type ModalProps =
+export type ModalProps =
   | CreateCategoryModalProps
   | EditCategoryModalProps
   | DeleteCategoryModalProps
   | CreateTransactionModalProps
   | EditTransactionModalProps
   | DeleteTransactionModalProps;
-type ModalType = ModalProps["modalType"] | null;
-type ModalData = ModalProps["data"] | null;
+export type ModalType = ModalProps["modalType"] | null;
+export type ModalData = ModalProps["data"] | null;
 
 interface ModalStore {
   type: ModalType;

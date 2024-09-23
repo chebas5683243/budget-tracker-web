@@ -1,17 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { CategoriesStats } from "./categories-stats";
 import { OverallStats } from "./overall-stats";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { useGetSettings } from "@/services/settings/get-settings";
+import { useGetCategoryOverviewReport } from "@/services/transactions/get-transactions copy";
+import { CategoryType } from "@/types/categories";
+import { Currency } from "@/types/settings";
 
-import { startOfMonth } from "date-fns";
+import { endOfDay, startOfMonth } from "date-fns";
 
 export function Overview() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfMonth(new Date()),
     to: new Date(),
+  });
+
+  const { data: categoriesOverview } = useGetCategoryOverviewReport({
+    startDate: dateRange.from.getTime(),
+    endDate: endOfDay(dateRange.to.getTime()).getTime(),
+  });
+
+  const balances = useMemo(() => {
+    if (!categoriesOverview) return undefined;
+
+    let income = 0;
+    let expense = 0;
+
+    categoriesOverview.forEach((catOverview) => {
+      if (catOverview.category.type === CategoryType.EXPENSE) {
+        expense += catOverview.sum.amount;
+      } else {
+        income += catOverview.sum.amount;
+      }
+    });
+
+    return { income, expense, balance: income - expense };
+  }, [categoriesOverview]);
+
+  const { data: currency } = useGetSettings<Currency>({
+    select: (settings) => settings.currency,
   });
 
   return (
@@ -33,8 +63,13 @@ export function Overview() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <OverallStats />
-        <CategoriesStats />
+        <OverallStats balances={balances} currency={currency} />
+        <CategoriesStats
+          categoriesOverview={categoriesOverview}
+          income={balances?.income}
+          expense={balances?.expense}
+          currency={currency}
+        />
       </div>
     </div>
   );

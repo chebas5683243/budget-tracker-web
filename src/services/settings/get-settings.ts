@@ -7,10 +7,10 @@ import {
   type UseQueryOptions,
 } from "@tanstack/react-query";
 
-type SettingsQuery = UseQueryOptions<Settings, unknown, Settings, QueryKey>;
+type SettingsQuery<TData> = UseQueryOptions<Settings, unknown, TData, QueryKey>;
 
-export function useGetSettings(
-  options?: Omit<SettingsQuery, "queryKey" | "queryFn">,
+export function useGetSettings<TData = Settings>(
+  options?: Omit<SettingsQuery<TData>, "queryKey" | "queryFn">,
 ) {
   const { createAuthApi } = useAuthAxios();
 

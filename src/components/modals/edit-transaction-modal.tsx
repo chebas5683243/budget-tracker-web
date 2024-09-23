@@ -17,8 +17,8 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { CreateTransactionModalProps, useModal } from "@/hooks/use-modal-store";
-import { useCreateTransaction } from "@/services/transactions/create-transaction";
+import { EditTransactionModalProps, useModal } from "@/hooks/use-modal-store";
+import { useUpdateTransaction } from "@/services/transactions/update-transaction";
 import { CategoryType } from "@/types/categories";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,16 +34,16 @@ const FormSchema = z.object({
 
 type FormData = z.infer<typeof FormSchema>;
 
-export function CreateTransactionModal() {
+export function EditTransactionModal() {
   const { isOpen, type, data, onClose: onCloseModal } = useModal();
 
-  const mutation = useCreateTransaction();
+  const mutation = useUpdateTransaction();
 
   const { toast } = useToast();
 
-  const isModalOpen = isOpen && type === "createTransaction";
+  const isModalOpen = isOpen && type === "editTransaction";
 
-  const modalData = data as CreateTransactionModalProps["data"];
+  const modalData = data as EditTransactionModalProps["data"];
 
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
@@ -51,7 +51,7 @@ export function CreateTransactionModal() {
       description: "",
       amount: 0,
       category: undefined,
-      transactionDate: new Date().getTime(),
+      transactionDate: undefined,
     },
   });
 
@@ -66,7 +66,7 @@ export function CreateTransactionModal() {
     resetForm({
       description: "",
       amount: 0,
-      category: "",
+      category: undefined,
       transactionDate: new Date().getTime(),
     });
   }
@@ -79,53 +79,59 @@ export function CreateTransactionModal() {
   async function onSubmit() {
     try {
       toast({
-        description: "Creating transaction",
+        description: "Updating category",
         variant: "loading",
       });
 
       await mutation.mutateAsync({
-        description: form.getValues("description"),
+        id: modalData?.id!,
         amount: Number(form.getValues("amount")),
         category: {
           id: form.getValues("category"),
         },
+        description: form.getValues("description"),
         transactionDate: form.getValues("transactionDate"),
       });
 
       toast({
-        description: "Transaction created successuflly 🎉",
+        description: "Category updated successuflly 🎉",
         variant: "success",
       });
 
       onClose();
     } catch (e) {
       toast({
-        description: "Couldn't create transaction. Try later.",
+        description: "Couldn't update category. Try later.",
         variant: "destructive",
       });
     }
   }
 
   useEffect(() => {
-    if (modalData?.newCategoryId) {
-      form.setValue("category", modalData.newCategoryId);
+    if (modalData?.amount && modalData.category && modalData.transactionDate) {
+      resetForm({
+        amount: modalData.amount,
+        category: modalData.newCategoryId ?? modalData.category.id,
+        transactionDate: modalData.transactionDate,
+        description: modalData.description,
+      });
     }
-  }, [form, modalData?.newCategoryId]);
+  }, [resetForm, modalData]);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:w-[450px]">
         <DialogHeader>
           <DialogTitle>
-            Create a new{" "}
+            Edit{" "}
             <span
               className={
-                modalData?.type === CategoryType.INCOME
+                modalData?.category?.type === CategoryType.INCOME
                   ? "text-emerald-500"
                   : "text-red-500"
               }
             >
-              {modalData?.type}
+              {modalData?.category?.type}
             </span>{" "}
             transaction
           </DialogTitle>
@@ -174,12 +180,13 @@ export function CreateTransactionModal() {
                 <FormItem className="flex flex-col">
                   <FormLabel>Category</FormLabel>
                   <CategoryPicker
-                    trannsactionType={modalData?.type!}
+                    trannsactionType={modalData?.category?.type!}
                     value={field.value}
                     onChange={(categoryId) =>
                       form.setValue("category", categoryId)
                     }
-                    currModal="createTransaction"
+                    currModal="editTransaction"
+                    transactionData={modalData}
                   />
                   <FormDescription>
                     Select a category for this transaction
@@ -207,7 +214,7 @@ export function CreateTransactionModal() {
               <Button type="button" variant="secondary" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit">Create</Button>
+              <Button type="submit">Save</Button>
             </div>
           </form>
         </Form>

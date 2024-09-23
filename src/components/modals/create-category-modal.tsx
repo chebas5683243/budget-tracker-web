@@ -18,7 +18,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { CreateCategoryModalProps, useModal } from "@/hooks/use-modal-store";
-import { useCreateCategory } from "@/services/categories/createCategory";
+import { useCreateCategory } from "@/services/categories/create-category";
 import { CategoryType } from "@/types/categories";
 
 import { zodResolver } from "@hookform/resolvers/zod";

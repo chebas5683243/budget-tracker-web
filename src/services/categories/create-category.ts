@@ -12,7 +12,7 @@ type CreateCategoryMutation = UseMutationOptions<
   { newCategoryId: string },
   unknown,
   Partial<Category>,
-  { newCatogoryTempId: string }
+  { newCategoryTempId: string }
 >;
 
 export function useCreateCategory(
@@ -32,28 +32,28 @@ export function useCreateCategory(
       return { newCategoryId: response.data.id };
     },
     onMutate: async (newCategory) => {
-      const newCatogoryTempId = uuidv4();
+      const newCategoryTempId = uuidv4();
 
       await queryClient.cancelQueries({ queryKey: ["categories"] });
 
       queryClient.setQueryData<Category[]>(["categories"], (oldCategories) => {
         return [
           ...oldCategories!,
-          { id: newCatogoryTempId, ...newCategory } as Category,
+          { id: newCategoryTempId, ...newCategory } as Category,
         ];
       });
 
-      return { newCatogoryTempId };
+      return { newCategoryTempId };
     },
     onError: (err, _, context) => {
       queryClient.setQueryData<Category[]>(["categories"], (oldCategories) =>
-        oldCategories?.filter((cat) => cat.id !== context?.newCatogoryTempId),
+        oldCategories?.filter((cat) => cat.id !== context?.newCategoryTempId),
       );
     },
     onSuccess: (data, _, context) => {
       queryClient.setQueryData<Category[]>(["categories"], (oldCategories) =>
         oldCategories?.map((cat) =>
-          cat.id === context.newCatogoryTempId
+          cat.id === context.newCategoryTempId
             ? { ...cat, id: data.newCategoryId }
             : cat,
         ),

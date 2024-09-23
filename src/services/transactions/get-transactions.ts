@@ -34,7 +34,7 @@ export function useGetTransactions(
   );
 
   const query = useQuery({
-    queryKey: ["transactions", queryString],
+    queryKey: ["transactions", params],
     queryFn: async () => {
       const apiInstance = await createAuthApi();
       const response = await apiInstance.get<Transaction[]>(

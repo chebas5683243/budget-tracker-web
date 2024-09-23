@@ -1,3 +1,5 @@
+import { CategoryType } from "./categories";
+
 export interface Transaction {
   id: string;
   user: {
@@ -7,7 +9,7 @@ export interface Transaction {
     id: string;
     name: string;
     icon: string;
-    type: string;
+    type: CategoryType;
   };
   amount: number;
   description?: string;

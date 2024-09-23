@@ -12,7 +12,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useModal } from "@/hooks/use-modal-store";
 import { cn } from "@/lib/utils";
-import { useGetCategories } from "@/services/categories/getCategories";
+import { useGetCategories } from "@/services/categories/get-categories";
 import { CategoryType } from "@/types/categories";
 
 import { PlusSquare, TrendingDown, TrendingUp } from "lucide-react";

@@ -9,19 +9,19 @@ import {
   DialogDescription,
   DialogTitle,
 } from "../ui/dialog";
-import { DeleteCategoryModalProps, useModal } from "@/hooks/use-modal-store";
-import { useDeleteCategory } from "@/services/categories/delete-category";
+import { DeleteTransactionModalProps, useModal } from "@/hooks/use-modal-store";
+import { useDeleteTransaction } from "@/services/transactions/delete-transaction";
 
-export function DeleteCategoryModal() {
+export function DeleteTransactionModal() {
   const { isOpen, type, data, onClose: onCloseModal } = useModal();
 
-  const mutation = useDeleteCategory();
+  const mutation = useDeleteTransaction();
 
   const { toast } = useToast();
 
-  const isModalOpen = isOpen && type === "deleteCategory";
+  const isModalOpen = isOpen && type === "deleteTransaction";
 
-  const modalData = data as DeleteCategoryModalProps["data"];
+  const modalData = data as DeleteTransactionModalProps["data"];
 
   function onOpenChange(open: boolean) {
     if (open) return;
@@ -35,16 +35,16 @@ export function DeleteCategoryModal() {
   async function onSubmit() {
     try {
       toast({
-        description: "Deleting category",
+        description: "Deleting transaction",
         variant: "loading",
       });
 
       await mutation.mutateAsync({
-        categoryId: modalData?.categoryId!,
+        transactionId: modalData?.transactionId!,
       });
 
       toast({
-        description: "Category deleted successuflly 🎉",
+        description: "Transaction deleted successuflly 🎉",
         variant: "success",
       });
     } catch (e: any) {
@@ -67,7 +67,7 @@ export function DeleteCategoryModal() {
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
             This action cannot be undone. This will permanently delete your
-            category
+            transaction
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2 self-end">
@@ -96,12 +96,12 @@ function getErrorMessage(e: any) {
   const statusCode = e?.response?.status;
   if (statusCode === 409) {
     return {
-      title: "Category is being used by transactions",
-      description: "Delete or change the category in transactions.",
+      title: "Transaction is being used by transactions",
+      description: "Delete or change the transaction in transactions.",
     };
   }
 
   return {
-    description: "Couldn't delete category. Try later.",
+    description: "Couldn't delete transaction. Try later.",
   };
 }

@@ -22,7 +22,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { EditCategoryModalProps, useModal } from "@/hooks/use-modal-store";
-import { useUpdateCategory } from "@/services/categories/updateCategory";
+import { useUpdateCategory } from "@/services/categories/update-category";
 import { CategoryType } from "@/types/categories";
 
 import { zodResolver } from "@hookform/resolvers/zod";

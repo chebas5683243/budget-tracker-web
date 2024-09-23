@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 
+import {
+  CreateTransactionModalProps,
+  EditTransactionModalProps,
+  useModal,
+} from "../../hooks/use-modal-store";
 import { Separator } from "../ui/separator";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,44 +23,60 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useModal } from "@/hooks/use-modal-store";
 import { cn } from "@/lib/utils";
-import { TransactionType } from "@/types/transaction";
+import { useGetCategories } from "@/services/categories/get-categories";
+import { CategoryType } from "@/types/categories";
+import { Transaction } from "@/types/transactions";
 
 import { CheckIcon, ChevronsUpDown, PlusSquare } from "lucide-react";
 
 interface CategoryPickerProps {
   value: string;
   onChange: (value: string) => void;
-  trannsactionType: TransactionType;
+  trannsactionType: CategoryType;
+  currModal:
+    | CreateTransactionModalProps["modalType"]
+    | EditTransactionModalProps["modalType"];
+  transactionData?: Transaction;
 }
-
-const categories = [
-  { id: "1", label: "English" },
-  { id: "2", label: "French" },
-  { id: "3", label: "German" },
-  { id: "4", label: "Spanish" },
-  { id: "5", label: "Portuguese" },
-  { id: "6", label: "Russian" },
-  { id: "7", label: "Japanese" },
-  { id: "8", label: "Korean" },
-  { id: "9", label: "Chinese" },
-] as const;
 
 export function CategoryPicker({
   value,
   onChange,
   trannsactionType,
+  currModal,
+  transactionData,
 }: CategoryPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { onOpen } = useModal();
 
+  const { data: categories, isLoading } = useGetCategories();
+
+  const categoriesToRender = categories
+    ?.filter((category) => category.type === trannsactionType)
+    .toSorted((cat1, cat2) => cat1.name.localeCompare(cat2.name));
+
   function onCreateCategory() {
     setIsOpen(false);
+
+    let parentModal;
+
+    if (currModal === "editTransaction") {
+      parentModal = {
+        modalType: currModal,
+        data: transactionData,
+      };
+    } else {
+      parentModal = {
+        modalType: currModal,
+      };
+    }
+
     onOpen({
       modalType: "createCategory",
       data: {
         type: trannsactionType,
+        parentModal,
       },
     });
   }
@@ -76,10 +97,13 @@ export function CategoryPicker({
               "justify-between font-normal pl-3",
               !value && "text-muted-foreground",
             )}
+            disabled={isLoading}
           >
-            {value
-              ? categories.find((language) => language.id === value)?.label
-              : "Select category"}
+            <span>
+              {value
+                ? categoriesToRender?.find((cat) => cat.id === value)?.name
+                : "Select category"}
+            </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </FormControl>
@@ -97,19 +121,19 @@ export function CategoryPicker({
           </Button>
           <Separator />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No category found.</CommandEmpty>
             <CommandGroup>
-              {categories.map((language) => (
+              {categoriesToRender?.map((cat) => (
                 <CommandItem
-                  value={language.label}
-                  key={language.id}
-                  onSelect={() => onSelectCategory(language.id)}
+                  value={cat.name}
+                  key={cat.id}
+                  onSelect={() => onSelectCategory(cat.id)}
                 >
-                  {language.label}
+                  {cat.name}
                   <CheckIcon
                     className={cn(
                       "ml-auto h-4 w-4",
-                      language.id === value ? "opacity-100" : "opacity-0",
+                      cat.id === value ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </CommandItem>

@@ -2,14 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal-store";
-import { TransactionType } from "@/types/transaction";
+import { CategoryType } from "@/types/categories";
 
 import { BadgeMinus, BadgePlus } from "lucide-react";
 
 export function DashboardHeader() {
   const { onOpen } = useModal();
 
-  function openCreateTransactionModal(type: TransactionType) {
+  function openCreateTransactionModal(type: CategoryType) {
     onOpen({
       modalType: "createTransaction",
       data: {
@@ -25,7 +25,7 @@ export function DashboardHeader() {
         <Button
           type="button"
           variant="success"
-          onClick={() => openCreateTransactionModal("income")}
+          onClick={() => openCreateTransactionModal(CategoryType.INCOME)}
         >
           <BadgePlus className="mr-2 size-5" />
           New income
@@ -33,7 +33,7 @@ export function DashboardHeader() {
         <Button
           type="button"
           variant="danger"
-          onClick={() => openCreateTransactionModal("expense")}
+          onClick={() => openCreateTransactionModal(CategoryType.EXPENSE)}
         >
           <BadgeMinus className="mr-2 size-5" />
           New expense

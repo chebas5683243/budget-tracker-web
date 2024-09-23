@@ -25,8 +25,8 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { useGetSettings } from "@/services/settings/getSettings";
-import { useUpdateSettings } from "@/services/settings/updateSettings";
+import { useGetSettings } from "@/services/settings/get-settings";
+import { useUpdateSettings } from "@/services/settings/update-settings";
 import { Currency } from "@/types/settings";
 
 import { CheckIcon } from "lucide-react";
@@ -109,7 +109,7 @@ export function CurrencyPicker() {
               <CommandInput placeholder="Search category..." className="h-9" />
               <Separator />
               <CommandList>
-                <CommandEmpty>No framework found.</CommandEmpty>
+                <CommandEmpty>No category found.</CommandEmpty>
                 <CommandGroup>
                   {currencies.map((currency) => (
                     <CommandItem

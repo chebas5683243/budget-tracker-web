@@ -6,11 +6,11 @@ import { CategoriesStats } from "./categories-stats";
 import { OverallStats } from "./overall-stats";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { useGetSettings } from "@/services/settings/get-settings";
-import { useGetCategoryOverviewReport } from "@/services/transactions/get-transactions copy";
 import { CategoryType } from "@/types/categories";
 import { Currency } from "@/types/settings";
 
 import { endOfDay, startOfMonth } from "date-fns";
+import { useGetCategoryOverviewReport } from "@/services/reports/get-categories-overview";
 
 export function Overview() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({

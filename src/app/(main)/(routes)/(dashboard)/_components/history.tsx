@@ -1,6 +1,8 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useGetHistoryPeriods } from "@/services/reports/get-history-periods";
 
 import {
   BarChart,
@@ -202,12 +204,21 @@ const data = [
 ];
 
 export function History() {
+  const { data: periods } = useGetHistoryPeriods();
+
   return (
     <div className="container mb-10">
       <div className="py-6">
         <h2 className="text-3xl font-bold">History</h2>
       </div>
       <Card className="flex items-center gap-3 p-2">
+        <ToggleGroup type="single">
+          {periods?.map((period) => (
+            <ToggleGroupItem key={period} value={period.toString()}>
+              {period}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart height={300} width={500} data={data}>
             <defs>
@@ -231,7 +242,7 @@ export function History() {
             <YAxis axisLine={false} tickLine={false} className="text-xs" />
             <Tooltip
               cursor={{ className: "opacity-10" }}
-              // eslint-disable-next-line
+              // eslint-disable-next-line react/no-unstable-nested-components
               content={({ payload }) => {
                 const payloadData = payload?.[0]?.payload;
 

@@ -18,8 +18,8 @@ export enum Currency {
 }
 
 export enum Language {
-  SPANISH = "SPANISH",
-  ENGLISH = "ENGLISH",
+  es = "es",
+  en = "en",
 }
 
 export interface Settings {

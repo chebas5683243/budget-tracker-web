@@ -8,3 +8,7 @@ declare module "@tanstack/table-core" {
     };
   }
 }
+
+declare global {
+  type SetState<T> = (value: T | ((prevState: T) => T)) => void;
+}

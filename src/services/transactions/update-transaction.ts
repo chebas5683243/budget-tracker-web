@@ -35,6 +35,12 @@ export function useUpdateTransaction(
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["reports", "history-data"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["reports", "categories-overview"],
+      });
     },
     ...options,
   });

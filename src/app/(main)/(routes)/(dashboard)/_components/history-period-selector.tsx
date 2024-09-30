@@ -60,11 +60,13 @@ export function HistoryPeriodSelector({
           value={value.year}
           onValueChange={onYearChange}
         />
-        <MonthSelector
-          months={monthsList}
-          value={value.month}
-          onValueChange={onMonthChange}
-        />
+        {value.timeframe === Timeframe.MONTH && (
+          <MonthSelector
+            months={monthsList}
+            value={value.month}
+            onValueChange={onMonthChange}
+          />
+        )}
       </div>
     </div>
   );

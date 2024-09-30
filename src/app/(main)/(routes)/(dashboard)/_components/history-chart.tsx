@@ -55,6 +55,10 @@ export function HistoryChart({
 
   if (isLoading) return <HistoryChartSkeleton />;
 
+  if (formattedRecords.length === 0) {
+    return <HistoryChartNoData />;
+  }
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart height={300} width={500} data={formattedRecords}>
@@ -95,6 +99,14 @@ export function HistoryChart({
         />
       </BarChart>
     </ResponsiveContainer>
+  );
+}
+
+function HistoryChartNoData() {
+  return (
+    <div className="w-full h-[300px] bg-muted rounded-md">
+      No data for this period
+    </div>
   );
 }
 

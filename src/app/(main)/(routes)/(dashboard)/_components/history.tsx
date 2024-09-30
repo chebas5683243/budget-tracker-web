@@ -15,7 +15,7 @@ export function History() {
     year: new Date().getFullYear(),
   });
 
-  const { data: records, isFetching: isFetchinRecords } = useGetHistoryData({
+  const { data: records, isLoading: isFetchinRecords } = useGetHistoryData({
     timeframe: period.timeframe,
     year: period.year,
     month: period.month,

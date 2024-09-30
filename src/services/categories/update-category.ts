@@ -58,6 +58,9 @@ export function useUpdateCategory(
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({
+        queryKey: ["reports", "categories-overview"],
+      });
     },
     ...options,
   });

@@ -25,10 +25,13 @@ export function useGetHistoryData(
   const { timeframe, year, month } = params;
 
   const queryString = useMemo(() => {
+    const timezoneOffset = new Date().getTimezoneOffset();
+
     if (timeframe === Timeframe.YEAR) {
       return new URLSearchParams({
         timeframe,
         year: year.toString(),
+        timezoneOffset: timezoneOffset.toString(),
       }).toString();
     }
 
@@ -36,6 +39,7 @@ export function useGetHistoryData(
       timeframe,
       year: year.toString(),
       month: month.toString(),
+      timezoneOffset: timezoneOffset.toString(),
     }).toString();
   }, [timeframe, year, month]);
 

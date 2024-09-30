@@ -211,10 +211,17 @@ export function EditTransactionModal() {
               )}
             />
             <div className="flex gap-2 self-end">
-              <Button type="button" variant="secondary" onClick={onClose}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onClose}
+                disabled={mutation.isPending}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit" disabled={mutation.isPending}>
+                Save
+              </Button>
             </div>
           </form>
         </Form>

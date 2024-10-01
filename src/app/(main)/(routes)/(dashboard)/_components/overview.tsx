@@ -5,12 +5,12 @@ import { useMemo, useState } from "react";
 import { CategoriesStats } from "./categories-stats";
 import { OverallStats } from "./overall-stats";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { useGetCategoryOverviewReport } from "@/services/reports/get-categories-overview";
 import { useGetSettings } from "@/services/settings/get-settings";
 import { CategoryType } from "@/types/categories";
 import { Currency } from "@/types/settings";
 
 import { endOfDay, startOfMonth } from "date-fns";
-import { useGetCategoryOverviewReport } from "@/services/reports/get-categories-overview";
 
 export function Overview() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({

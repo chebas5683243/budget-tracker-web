@@ -1,10 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { CategoryTypeStatsData } from "./category-type-stats-data";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { CategoryType } from "@/types/categories";
 import { CategoryOverviewItem } from "@/types/reports";
 import { Currency } from "@/types/settings";
-import { CategoryTypeStatsData } from "./category-type-stats-data";
 
 interface CategoryStatsProps {
   categoriesOverview: CategoryOverviewItem[] | undefined;
